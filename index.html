@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Weather App</title>
+    <!--    nice font-->
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,700" rel="stylesheet">
+    <!--  Bootstrap  -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!--  weather icons -->
+    <link rel="stylesheet" href="css/weather-icons.min.css">
+    <link rel="stylesheet" href="css/weather-icons-wind.min.css">
+    <style>
+        
+        body{
+            font-family: Nunito, sans-serif;
+            background: url('https://images.unsplash.com/photo-1469386220931-a05a3a71cbb5?dpr=1&auto=format&fit=crop&w=767&h=511&q=80&cs=tinysrgb&crop=') no-repeat center center;
+            background-size: cover;
+        }
+        
+        .row{
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 100vh;
+            margin:0;
+        }
+        
+        .container-fluid {
+            padding: 0px;
+            height: 100vh;
+            /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#4c4c4c+0,131313+100&0.5+0,0.5+100 */
+            background: -moz-linear-gradient(top,  rgba(76,76,76,0.5) 0%, rgba(19,19,19,0.8) 100%); /* FF3.6-15 */
+            background: -webkit-linear-gradient(top,  rgba(76,76,76,0.5) 0%,rgba(19,19,19,0.8) 100%); /* Chrome10-25,Safari5.1-6 */
+            background: linear-gradient(to bottom,  rgba(76,76,76,0.5) 0%,rgba(19,19,19,0.8) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#804c4c4c', endColorstr='#80131313',GradientType=0 ); /* IE6-9 */
+
+        }
+        
+        .card{
+            background-color:#fff;
+            box-shadow: 0px 2px 10px 3px rgba(51, 51, 51, 0.25);
+            padding:20px;
+            font-size: 2em;
+            margin:20px;
+            display: none;
+            border-radius: 4px;
+            opacity: 0.85;
+        }
+        
+        .card .part {
+            border-bottom:1px solid #f5f5f5;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .card p {
+            text-align: left;
+            margin-bottom:2px;
+        }
+        
+        .card .title {
+            font-size:0.5em;
+            color:#999;
+            text-transform: uppercase;
+            font-weight: 600;
+            color:#7d7d7d;
+        }
+        
+        .card .graphics {
+            background-color:#34495e;
+            padding: 20px 30px;
+        }
+        
+        .card .wi{
+            color: whitesmoke;
+            font-size: 2.5em;
+        }
+        
+/*        code for ios style switch */
+
+        
+      .wrapper {
+            position: absolute;
+            right: 0px;
+            bottom: 0px;
+        }
+        
+        input#toggle {
+          max-height: 0;
+          max-width: 0;
+          opacity: 0;
+        }
+        
+        input#toggle + label {
+          display: block;
+          position: relative;
+          box-shadow: inset 0 0 0px 1px #d5d5d5;
+/*          text-indent: -5000px;*/
+          height: 30px;
+          width: 50px;
+          border-radius: 15px;
+        }
+
+        input#toggle + label:before {
+          content: "";
+          position: absolute;
+          display: block;
+          height: 30px;
+          width: 30px;
+          top: 0;
+          left: 0;
+          border-radius: 15px;
+          background: rgba(19, 191, 17, 0);
+          -moz-transition: .25s ease-in-out;
+          -webkit-transition: .25s ease-in-out;
+          transition: .25s ease-in-out;
+        }
+
+        input#toggle + label:after {
+          content: "";
+          position: absolute;
+          display: block;
+          height: 30px;
+          width: 30px;
+          top: 0;
+          left: 0px;
+          border-radius: 15px;
+          background: white;
+          box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .2), 0 2px 4px rgba(0, 0, 0, .2);
+          -moz-transition: .25s ease-in-out;
+          -webkit-transition: .25s ease-in-out;
+          transition: .25s ease-in-out;
+        }
+        
+        input#toggle:checked + label:before {
+          width: 50px;
+          background: rgba(19, 191, 17, 1);
+        }
+
+        input#toggle:checked + label:after {
+          left: 20px;
+          box-shadow: inset 0 0 0 1px rgba(19, 191, 17, 1), 0 2px 4px rgba(0, 0, 0, .2);
+        }
+        
+    /* custom spinner css */
+        
+        .full-page-spinner{
+            height: 100vh;
+            position: absolute;
+            z-index: 9999;         
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color:white;
+            font-weight: 500;
+            top: 0;
+        }
+        
+        .full-page-spinner p{
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+        
+        .loader{
+            width: 50px;
+            height: 50px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 50%;
+            border-top: 5px solid rgba(255, 255, 255, 1);
+            border-right: 5px solid rgba(255, 255, 255, 1);
+            border-bottom: 5px solid rgba(255, 255, 255, 1);
+            border-left: 5px solid rgba(19, 191, 17, 1);
+            animation: spin 1s linear infinite;
+            box-shadow: 0px 0px 3px 3px rgba(51, 51, 51, 0.26);
+            }
+
+            @keyframes spin{
+              0%{
+                transform:rotate(O);
+              }
+              100%{
+                transform:rotate(360deg);
+              }
+            }
+        
+        /* custom spinner css */
+  
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+   <div class="row">
+       <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+            <div class="card text-center">
+                <div class="graphics jumbotron">
+                    <i class="wi"></i>
+                </div>   
+                <div class="info">
+                    <div class="part">
+                       <p class="title">Region</p>
+                        <p class="city"></p>
+                    </div>
+                    <div class="part">
+                        <p class="title">Temperature</p>
+                        <p class="temp"></p>
+                        
+                        <p class="wrapper">
+                            <input type="checkbox" name="toggle" id="toggle" checked>
+                            <label for="toggle"></label>
+                        </p>
+                        
+                    </div> 
+                    <div class="part">
+                        <p class="title">Humidity</p>
+                        <p class="humidity"></p>
+                    </div>
+                    <div class="part">
+                        <p class="title">Summary</p>
+                        <p class="description"></p>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div> <!--row -->
+    
+    <!-- spinner section starts-->
+    <div class="spinner-section full-page-spinner">
+        <div class="loader"></div>
+        <p><i>Fetching your data</i></p>
+    </div>
+    <!-- spinner section ends -->    
+    
+</div><!-- container -->
+
+
+
+<!-- jquery library-->
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+       
+<!-- custom js -->   
+    <script>
+    
+        $(document).ready(function(){
+            
+            showWeather();
+
+            function showWeather(){
+                if(navigator.geolocation){
+                    navigator.geolocation.getCurrentPosition(geolocationSuccess,geolocationFail);
+                    console.log('geolocaation API supprted ');
+                }
+                else{
+                    console.log('geolocation API does not work');
+                }
+            }//show Weather ends
+
+
+            function geolocationSuccess(position){
+                var lat = position.coords.latitude;
+                var lon = position.coords.longitude;
+                //calling main function to find weather
+                findWeather(lat,lon);
+
+            }//geolocationSuccess ends
+
+            function geolocationFail(error){
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        if(error.message.indexOf("Only secure origins are allowed") == 0) {
+                            googleGeo();
+                          }
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        alert("Location information is unavailable.");
+                        break;
+                    case error.TIMEOUT:
+                        alert("The request to get user location timed out.");
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        alert("An unknown error occurred.")
+                        break;
+                }
+            }//geolocationFail ends
+
+            function googleGeo(){
+                //using google maps geolocation API
+                $.post( "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAY6Cbb-gTuPwF5LaGCZjentirq8vMzyF0", function(data) {
+                    var lati = data.location.lat;
+                    var longi = data.location.lng;
+                    //calling main function to find weather 
+                    findWeather(lati,longi);
+                });
+            }//googleGeo ends 
+
+
+            function findWeather(latitude,longitude){
+                var temp = $('.temp');
+                var city = $('.city');
+                var description = $('.description');
+                var humidity = $('.humidity');
+                var card = $('.card')
+                var icon = card.find('i');
+                
+            // ajax request for current location weather
+            $.getJSON('http://api.openweathermap.org/data/2.5/weather?lat='+latitude+'&'+'lon='+longitude+'&units=metric&appid=73e01ee1a5af62e8e9699044fd41b048',function(res){
+                        
+                    console.log(JSON.stringify(res));
+                    console.log(res.weather[0].description);
+                    console.log(res.main.humidity);
+                    
+                        
+                    var cTemp = Math.ceil(res.main.temp)+"&deg;C"; // celsius temp
+                    var fTemp = Math.ceil((Math.round(res.main.temp))* 9 / 5 + 32)+"&deg;F";;  //fahrenheit temp   
+                    var cityName = res.name;      
+                    var countryName = res.sys.country;
+                    var descrip = res.weather[0].description.charAt(0).toUpperCase() + res.weather[0].description.slice(1);
+                    var humid = res.main.humidity;
+                    var weather = res.weather[0].description;
+                  
+                    
+                    
+            // ajax request for local time    
+             $.getJSON('http://api.geonames.org/timezoneJSON?lat=' + latitude + '&lng=' + longitude + '&username=ayoisaiah', function(timezone) {
+                        var rawTimeZone = JSON.stringify(timezone);
+                        var parsedTimeZone = JSON.parse(rawTimeZone);
+                        var dateTime = parsedTimeZone.time;
+                        timeFull = dateTime.substr(11);
+//                            $(".local-time").html(timeFull); //Update local time
+                         var timeHour = dateTime.substr(-5, 2);
+                    
+ 
+                   console.log(dateTime);
+                 
+                 
+                     $('.spinner-section').fadeOut('slow');
+                     card.fadeIn();
+                  
+                    if(weather.indexOf("rain") >= 0) {
+                        
+                        if(timeHour >=7  && timeHour < 20){
+                            icon.removeClass().addClass('wi wi-day-rain');
+                        }
+                        else{
+                            icon.removeClass().addClass('wi wi-night-alt-rain');
+                        }
+                    }
+
+                    else if (weather.indexOf("sunny") >= 0) {                       
+                            icon.removeClass().addClass('wi wi-day-sunny');
+                    }
+
+                    else if (weather.indexOf("clear") >= 0) {
+                        if(timeHour >=7  && timeHour < 20){
+                            icon.removeClass().addClass('wi wi-day-sunny');
+                        }
+                        else{
+                            icon.removeClass().addClass('wi wi-night-clear');
+                        }
+                    }
+                        
+                    else if (weather.indexOf("haze") >= 0) {
+                        icon.removeClass().addClass('wi wi-day-haze');
+                    }    
+
+                    else if (weather.indexOf("clouds") >= 0) {
+                        if(timeHour >=7  && timeHour < 20){
+                            icon.removeClass().addClass('wi wi-day-cloudy');
+                        }
+                        else{
+                            icon.removeClass().addClass('wi wi-night-alt-cloudy');
+                        }
+                    }
+                        
+                    else if (weather.indexOf("thunderstorm") >= 0) {
+                        if(timeHour >=7  && timeHour < 20){
+                            icon.removeClass().addClass('wi wi-day-thunderstorm');
+                        }
+                        else{
+                            icon.removeClass().addClass('wi wi-night-thunderstorm');
+                        }
+                    }
+                 
+                    else if (weather.indexOf("fog") >= 0) {
+                        if(timeHour >=7  && timeHour < 20){
+                            icon.removeClass().addClass('wi wi-day-fog');
+                        }
+                        else{
+                            icon.removeClass().addClass('wi wi-night-fog');
+                        }
+                    }
+                        
+                    else if (weather.indexOf("smoke") >= 0) {
+                        icon.removeClass().addClass('wi wi-smoke');
+                    }    
+                        
+                    else{
+                        icon.removeClass().addClass('wi wi-night-alt-cloudy');
+                    }    
+                      
+                      
+                    temp.html(cTemp);    
+                    city.html(cityName+", "+countryName);
+                    description.html(descrip);
+                    humidity.html(humid+"%");
+                    
+                    
+                    // toggling between celsius and fahrenheit            
+                        
+                    $('#toggle').on('click',function(){
+                     
+                        var $this = $(this);
+                        if(!$this.is(":checked")){
+                            temp.html(fTemp);
+                        }
+                        else {
+                            temp.html(cTemp);
+                        }
+                        
+                    });
+                     
+                });  // request for get current local time ends    
+                        
+            }); // request for get current location ends 
+            
+        }//findweather ends    
+                
+    }); //dom ends
+    
+    </script>
+    
+    
+    
+    <!-- google analytics code -->
+    <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-77508395-1', 'auto');
+          ga('send', 'pageview');
+
+    </script>
+
+</body>
+</html>
